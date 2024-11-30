@@ -1,0 +1,44 @@
+import chess
+import chess.engine
+import os
+
+def play_chess():
+    board = chess.Board()
+
+    # AI engine initialization
+    print("Starting Stockfish AI engine...")
+    stockfish_path = "stockfish"  # Adjust path if Stockfish isn't in your PATH
+    with chess.engine.SimpleEngine.popen_uci(stockfish_path) as engine:
+        print("Chess game started! Play against the AI.")
+        print("Enter your moves in standard algebraic notation (e.g., e2e4, d7d5).")
+        print("Type 'quit' to end the game.\n")
+
+        while not board.is_game_over():
+            print(board)
+            print("\nYour move: ")
+            player_move = input(">>> ").strip()
+
+            if player_move.lower() == "quit":
+                print("Game over. You quit.")
+                break
+
+            try:
+                board.push_san(player_move)
+            except ValueError:
+                print("Invalid move! Try again.")
+                continue
+
+            if board.is_game_over():
+                print("Game over!")
+                break
+
+            print("\nAI is thinking...")
+            result = engine.play(board, chess.engine.Limit(time=2.0))  # AI move
+            board.push(result.move)
+
+        print("Final Board State:")
+        print(board)
+        print("\nGame Over. Result:", board.result())
+
+if __name__ == "__main__":
+    play_chess()
